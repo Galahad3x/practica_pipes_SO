@@ -7,18 +7,17 @@ Joel Aumedes Serrano
 #include "all.h"
 
 int N;
-void tancar();
 
 int main(int argc, char *argv[]) {
-    signal(SIGTERM, tancar);
-    char s[100];
-    N = *argv[1];
+    N = atoi(argv[1]);
+    //Escriure un a un els números al pipe de nombres
     for(int i = 2;i <= N;i++){
-        write(GC_ENT,&i,sizeof(i));
+        if(write(GC_ENT,&i,sizeof(int)) <= 0){
+            perror("Error escrivint al pipe de nombres: ");
+            exit(-2);
+        }
     }
     close(GC_ENT);
-}
-
-void tancar(){
-    exit(0);
+    signal(SIGTERM, SIG_DFL);
+    pause();
 }

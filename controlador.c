@@ -10,28 +10,22 @@ int N;
 int PROCESSES;
 
 int main(int argc, char *argv[]) {
+    PROCESSES = atoi(argv[1]);
     char s[100] = "Calcular primers de 2 a : ";
     char n[NUMSIZE + 1];
-    while(0 < 1){ //LLegir fins a on calcular
+    do{ //LLegir fins a on calcular
         if(write(1,s,sizeof(s)) <= 0){
             perror("Error al escriure a sortida estàndard: ");
             exit(-3);
         }
-        read(0,n,NUMSIZE);
-        N = atoi(n);
-        if(N > 2){
-            break;
-        }else{
-            sprintf(s,"Número no vàlid, torna a escriure: \n");
+        if(read(0,n,sizeof(n)) < 0){
+            perror("Error al llegir de l'entrada estàndard: ");
+            exit(-3);
         }
-    }
-    char s2[100];
-    PROCESSES = atoi(argv[1]);
-    sprintf(s2, "Processos a crear: %i Primers a calcular: de 2 a %d\n", PROCESSES, N);
-    if(write(1,s2,strlen(s2)) <= 0){
-        perror("Error al escriure a sortida estàndard: ");
-        exit(-3);
-    }
+        N = atoi(n);
+        sprintf(s,"Número no vàlid, torna a escriure: ");
+    }while(N < 2);
+
     int gcfd[2];
     int ccfd[2];
 
@@ -72,7 +66,6 @@ int main(int argc, char *argv[]) {
                 perror("Error al crear calculador: ");
                 exit(-1);
             case 0:
-                //Tancament de descriptors innecessaris
                 dup2(ccfd[1],CC_ENT);
                 dup2(gcfd[0],GC_SORT);
                 close(ccfd[0]);
@@ -83,7 +76,6 @@ int main(int argc, char *argv[]) {
                     perror("Error durant el recobriment d'un calculador: ");
                     exit(-2);
                 }
-                exit(0);
         }
     }
 
@@ -122,8 +114,6 @@ int main(int argc, char *argv[]) {
 
     int primesExit = 0;
     int status = 0;
-
-    sleep(1);
 
     //Tancar els calculadors
     for(int i = 0; i < PROCESSES;i++){
